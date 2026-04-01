@@ -2,66 +2,86 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, TerminalSquare, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { TerminalSquare, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { z } from "zod";
+import { submitContactForm } from "@/actions/contact";
 
 const formSchema = z.object({
-  command: z.string().min(2, "El comando debe tener al menos 2 caracteres."),
+  name: z.string().optional(),
+  email: z.string().email("El formato de correo no es válido.").or(z.literal("")),
+  command: z.string().min(5, "El protocolo requiere una descripción (min 5 chars)."),
   privacyAccepted: z.boolean().refine((val) => val === true, {
-    message: "Debe aceptar el aviso de privacidad.",
+    message: "Debe aceptar el Aviso de Privacidad para encriptar la transmisión.",
   }),
 });
 
 export default function Terminal() {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [nameVal, setNameVal] = useState("");
+  const [emailVal, setEmailVal] = useState("");
   const [inputVal, setInputVal] = useState("");
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  
   const [history, setHistory] = useState<{ id: string; type: "input" | "system" | "error" | "success"; text: string }[]>([
-    { id: "init-1", type: "system", text: "HIPERSOFT MAINFRAME v1.0.9" },
-    { id: "init-2", type: "system", text: "Estableciendo conexión segura... OK" },
-    { id: "init-3", type: "system", text: "Ingrese comando o mensaje para el sistema:" },
+    { id: "init-1", type: "system", text: "[SYSTEM] Initializing contact mainframe..." },
+    { id: "init-2", type: "system", text: "[SYSTEM] Establishing secure tunnel... DONE." },
+    { id: "init-3", type: "system", text: "[SYSTEM] Please provide identification to proceed." },
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  // Auto-focus terminal on click
-  const handleTerminalClick = () => {
-    inputRef.current?.focus();
-  };
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
   const simulateHackingLatency = async () => {
-    return new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 800));
+    return new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 500));
   };
 
   const handleCommand = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputVal.trim() && !privacyAccepted) return;
 
-    const newCmd = inputVal;
-    setInputVal("");
+    const data = { name: nameVal, email: emailVal, command: inputVal, privacyAccepted };
     
-    // Add user input to history
-    setHistory((prev) => [...prev, { id: Date.now().toString(), type: "input", text: `> ${newCmd}` }]);
+    setHistory((prev) => [
+      ...prev, 
+      { id: Date.now().toString(), type: "input", text: `root@hipersoft:~$ init_contact_sequence` }
+    ]);
 
     try {
       // Zod Validation
-      formSchema.parse({ command: newCmd, privacyAccepted });
+      formSchema.parse(data);
       
       setIsProcessing(true);
       setHistory((prev) => [...prev, { id: Date.now().toString() + "-process", type: "system", text: "[PROCESANDO] Estableciendo handshake cifrado..." }]);
       
-      // Simulate network request without actually blocking main thread completely
       await simulateHackingLatency();
+
+      // Call Server Action
+      const result = await submitContactForm({
+        name: data.name,
+        email: data.email || undefined,
+        command: data.command
+      });
       
-      setHistory((prev) => [...prev, { id: Date.now().toString() + "-success", type: "success", text: "Datos transmitidos correctamente. Fin de la transmisión." }]);
+      setHistory((prev) => [...prev, { id: Date.now().toString() + "-success", type: "success", text: result.message }]);
+      
+      // Limpiar formulario tras éxito
+      setInputVal("");
+      setNameVal("");
+      setEmailVal("");
+      setPrivacyAccepted(false);
+
     } catch (err) {
       if (err instanceof z.ZodError) {
         setHistory((prev) => [
           ...prev, 
-          { id: Date.now().toString() + "-error", type: "error", text: `ERROR DE SINTAXIS: ${(err as any).errors[0].message}` }
+          { id: Date.now().toString() + "-error", type: "error", text: `ROOT_ERROR: ${(err as any).errors[0].message}` }
+        ]);
+      } else {
+        setHistory((prev) => [
+          ...prev, 
+          { id: Date.now().toString() + "-error", type: "error", text: `SYSTEM_FAILURE: ${(err as Error).message}` }
         ]);
       }
     } finally {
@@ -71,89 +91,105 @@ export default function Terminal() {
   };
 
   return (
-    <div 
-      onClick={handleTerminalClick}
-      className="w-full max-w-4xl mx-auto bg-surface-container border border-outline/30 p-1 relative overflow-hidden font-display shadow-2xl glow-box cursor-text"
-    >
-      {/* Scanline overlay */}
-      <div className="absolute inset-0 pointer-events-none scanline opacity-20 z-10" />
-
-      {/* Terminal Header */}
-      <div className="bg-surface-container-highest border-b border-outline/50 p-3 flex items-center justify-between z-20 relative">
-        <div className="flex items-center gap-2 text-primary">
-          <TerminalSquare size={18} />
-          <span className="text-sm tracking-widest uppercase font-bold">Terminal Activa</span>
-        </div>
+    <div className="bg-[#131313] border border-primary/30 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
+      
+      <div className="bg-[#2a2a2a] px-4 py-2 flex items-center justify-between border-b border-primary/10">
         <div className="flex gap-2">
-          <div className="w-3 h-3 rounded-none bg-outline/50" />
-          <div className="w-3 h-3 rounded-none bg-outline/50" />
-          <div className="w-3 h-3 rounded-none bg-primary glow-box animate-pulse" />
+          <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
+          <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+          <div className="w-3 h-3 rounded-full bg-primary/50"></div>
         </div>
+        <span className="text-[10px] font-mono text-primary/50 uppercase tracking-widest hidden md:inline">
+          CONTACT_PROTOCOL_BETA
+        </span>
       </div>
 
-      {/* Terminal Body */}
-      <div className="p-6 h-[400px] overflow-y-auto flex flex-col gap-2 z-20 relative">
-        <AnimatePresence>
-          {history.map((line) => (
-            <motion.div
-              key={line.id}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className={`text-sm md:text-base font-mono tracking-tight ${
-                line.type === "error" ? "text-red-500" :
-                line.type === "success" ? "text-primary glow-text" :
-                line.type === "input" ? "text-white" : "text-[#baccb0]"
-              }`}
-            >
-              {line.type === "error" && <AlertTriangle size={14} className="inline mr-2 mb-1" />}
-              {line.type === "success" && <CheckCircle2 size={14} className="inline mr-2 mb-1" />}
-              {line.text}
+      <div className="p-4 md:p-8 font-mono text-sm space-y-4">
+        <div className="h-[200px] overflow-y-auto flex flex-col gap-2 mb-4 scrollbar-thin scrollbar-thumb-primary/20">
+          <AnimatePresence>
+            {history.map((line) => (
+              <motion.div
+                key={line.id}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`text-xs md:text-sm tracking-tight ${
+                  line.type === "error" ? "text-red-500" :
+                  line.type === "success" ? "text-primary glow-text font-bold" :
+                  line.type === "input" ? "text-white" : "text-primary/70"
+                }`}
+              >
+                {line.type === "error" && <AlertTriangle size={14} className="inline mr-2 mb-1" />}
+                {line.type === "success" && <CheckCircle2 size={14} className="inline mr-2 mb-1" />}
+                {line.text}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          {isProcessing && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-primary font-mono text-sm animate-pulse">
+              _
             </motion.div>
-          ))}
-        </AnimatePresence>
-        
-        {isProcessing && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} 
-            className="text-primary font-mono text-sm animate-pulse"
-          >
-            _
-          </motion.div>
-        )}
+          )}
+        </div>
 
-        {/* Input Area */}
-        <form onSubmit={handleCommand} className="mt-4 flex flex-col gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-primary glow-text font-bold">root@hipersoft:~#</span>
-            <input
-              ref={inputRef}
+        <form onSubmit={handleCommand} className="flex flex-col gap-4 border-t border-primary/10 pt-6">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-white/5 pb-2">
+            <label className="text-primary md:min-w-[120px] text-xs md:text-sm">IDENT_NAME:</label>
+            <input 
               type="text"
-              value={inputVal}
-              onChange={(e) => setInputVal(e.target.value)}
+              value={nameVal}
+              onChange={(e) => setNameVal(e.target.value)}
               disabled={isProcessing}
-              className="flex-1 bg-transparent border-none outline-none text-white font-mono caret-primary placeholder-[#baccb0]/50"
-              placeholder="Ingresa comando..."
-              autoComplete="off"
+              className="bg-transparent border-none outline-none focus:ring-0 p-0 text-white placeholder:text-white/20 w-full font-mono caret-primary text-xs md:text-sm" 
+              placeholder="input_name (opt)" 
             />
           </div>
 
-          <div className="flex items-center gap-3 mt-4 border border-outline/30 p-3 bg-surface z-30">
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-white/5 pb-2">
+            <label className="text-primary md:min-w-[120px] text-xs md:text-sm">IDENT_EMAIL:</label>
             <input 
-              type="checkbox" 
-              id="privacy"
-              checked={privacyAccepted}
-              onChange={(e) => setPrivacyAccepted(e.target.checked)}
-              className="w-4 h-4 appearance-none border border-primary checked:bg-primary checked:glow-box cursor-pointer"
-            />
-            <label htmlFor="privacy" className="text-xs font-mono tracking-widest uppercase text-[#baccb0] cursor-pointer select-none">
-              Acepto <a href="/aviso-de-privacidad" className="text-primary underline decoration-primary/50 hover:glow-text">Aviso de Privacidad</a> (Req. Seguridad)
-            </label>
-            <button 
-              type="submit" 
+              type="email"
+              value={emailVal}
+              onChange={(e) => setEmailVal(e.target.value)}
               disabled={isProcessing}
-              className="ml-auto bg-primary text-void px-4 py-1 text-xs font-bold uppercase hover:bg-white transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="bg-transparent border-none outline-none focus:ring-0 p-0 text-white placeholder:text-white/20 w-full font-mono caret-primary text-xs md:text-sm" 
+              placeholder="input_email (opt)" 
+            />
+          </div>
+
+          <div className="flex flex-col md:flex-row items-start gap-2 md:gap-4 border-b border-white/5 pb-2">
+            <label className="text-primary md:min-w-[120px] pt-1 text-xs md:text-sm">DATA_STRING:</label>
+            <textarea 
+              ref={inputRef}
+              value={inputVal}
+              onChange={(e) => setInputVal(e.target.value)}
+              disabled={isProcessing}
+              className="bg-transparent border-none outline-none focus:ring-0 p-0 text-white placeholder:text-white/20 w-full font-mono resize-none caret-primary text-xs md:text-sm" 
+              placeholder="describe_your_project (required)" 
+              rows={3}
+            ></textarea>
+          </div>
+
+          <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="flex items-center gap-3">
+              <input 
+                type="checkbox" 
+                id="privacy"
+                checked={privacyAccepted}
+                onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                className="w-4 h-4 appearance-none border border-primary checked:bg-primary cursor-pointer transition-colors"
+                disabled={isProcessing}
+              />
+              <label htmlFor="privacy" className="text-[10px] md:text-xs font-mono uppercase text-[#baccb0] cursor-pointer">
+                Acepto <a href="/aviso-de-privacidad" target="_blank" className="text-primary underline">Aviso de Privacidad</a>
+              </label>
+            </div>
+            
+            <button 
+              type="submit"
+              disabled={isProcessing}
+              className="w-full md:w-auto bg-primary text-black px-8 py-2 font-bold uppercase hover:shadow-[0_0_15px_rgba(57,255,20,0.5)] transition-all disabled:opacity-50 tracking-wider text-sm"
             >
-              Ejecutar <Send size={14} />
+              SEND_PROTOCOL
             </button>
           </div>
         </form>

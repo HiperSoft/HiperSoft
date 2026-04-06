@@ -8,17 +8,19 @@ import { submitContactForm } from "@/actions/contact";
 
 const formSchema = z.object({
   name: z.string().optional(),
-  email: z.string().email("El formato de correo no es válido.").or(z.literal("")),
+  contactMethod: z.enum(["email", "whatsapp"]),
+  contactValue: z.string().min(5, "Información de contacto inválida."),
   command: z.string().min(5, "El protocolo requiere una descripción (min 5 chars)."),
   privacyAccepted: z.boolean().refine((val) => val === true, {
-    message: "Debe aceptar el Aviso de Privacidad para encriptar la transmisión.",
+    message: "Debe aceptar el Aviso de Privacidad.",
   }),
 });
 
 export default function Terminal() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [nameVal, setNameVal] = useState("");
-  const [emailVal, setEmailVal] = useState("");
+  const [contactMethod, setContactMethod] = useState<"email" | "whatsapp">("email");
+  const [contactValue, setContactValue] = useState("");
   const [inputVal, setInputVal] = useState("");
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   
@@ -33,34 +35,32 @@ export default function Terminal() {
     inputRef.current?.focus();
   }, []);
 
-  const simulateHackingLatency = async () => {
-    return new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 500));
-  };
-
   const handleCommand = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputVal.trim() && !privacyAccepted) return;
 
-    const data = { name: nameVal, email: emailVal, command: inputVal, privacyAccepted };
+    const data = { 
+      name: nameVal, 
+      contactMethod, 
+      contactValue, 
+      command: inputVal, 
+      privacyAccepted 
+    };
     
     setHistory((prev) => [
       ...prev, 
-      { id: Date.now().toString(), type: "input", text: `root@hipersoft:~$ init_contact_sequence` }
+      { id: Date.now().toString(), type: "input", text: `root@hipersoft:~$ init_contact_sequence --method=${contactMethod}` }
     ]);
 
     try {
-      // Zod Validation
       formSchema.parse(data);
-      
       setIsProcessing(true);
-      setHistory((prev) => [...prev, { id: Date.now().toString() + "-process", type: "system", text: "[PROCESANDO] Estableciendo handshake cifrado..." }]);
+      setHistory((prev) => [...prev, { id: Date.now().toString() + "-process", type: "system", text: "[PROCESANDO] Cifrando paquetes de datos y enviando al servidor..." }]);
       
-      await simulateHackingLatency();
-
-      // Call Server Action
       const result = await submitContactForm({
         name: data.name,
-        email: data.email || undefined,
+        contactMethod: data.contactMethod,
+        contactValue: data.contactValue,
         command: data.command
       });
       
@@ -69,7 +69,7 @@ export default function Terminal() {
       // Limpiar formulario tras éxito
       setInputVal("");
       setNameVal("");
-      setEmailVal("");
+      setContactValue("");
       setPrivacyAccepted(false);
 
     } catch (err) {
@@ -86,7 +86,6 @@ export default function Terminal() {
       }
     } finally {
       setIsProcessing(false);
-      setTimeout(() => inputRef.current?.focus(), 100);
     }
   };
 
@@ -100,12 +99,12 @@ export default function Terminal() {
           <div className="w-3 h-3 rounded-full bg-primary/50"></div>
         </div>
         <span className="text-[10px] font-mono text-primary/50 uppercase tracking-widest hidden md:inline">
-          CONTACT_PROTOCOL_BETA
+          CONTACT_PROTOCOL_BETA_V2
         </span>
       </div>
 
       <div className="p-4 md:p-8 font-mono text-sm space-y-4">
-        <div className="h-[200px] overflow-y-auto flex flex-col gap-2 mb-4 scrollbar-thin scrollbar-thumb-primary/20">
+        <div className="h-[180px] overflow-y-auto flex flex-col gap-2 mb-4 scrollbar-thin scrollbar-thumb-primary/20">
           <AnimatePresence>
             {history.map((line) => (
               <motion.div
@@ -126,38 +125,60 @@ export default function Terminal() {
           </AnimatePresence>
           {isProcessing && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-primary font-mono text-sm animate-pulse">
-              _
+              _ TRANSMITIENDO...
             </motion.div>
           )}
         </div>
 
         <form onSubmit={handleCommand} className="flex flex-col gap-4 border-t border-primary/10 pt-6">
+          
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-white/5 pb-2">
-            <label className="text-primary md:min-w-[120px] text-xs md:text-sm">IDENT_NAME:</label>
+            <label className="text-primary md:min-w-[150px] text-xs md:text-sm">NOMBRE_COMPLETO:</label>
             <input 
               type="text"
               value={nameVal}
               onChange={(e) => setNameVal(e.target.value)}
               disabled={isProcessing}
-              className="bg-transparent border-none outline-none focus:ring-0 p-0 text-white placeholder:text-white/20 w-full font-mono caret-primary text-xs md:text-sm" 
+              className="bg-transparent border-none outline-none focus:ring-0 p-0 text-white placeholder:text-white/20 w-full font-mono caret-primary text-xs md:text-sm uppercase" 
               placeholder="input_name (opt)" 
             />
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-white/5 pb-2">
-            <label className="text-primary md:min-w-[120px] text-xs md:text-sm">IDENT_EMAIL:</label>
+            <label className="text-primary md:min-w-[150px] text-xs md:text-sm">VIA_CONTACTO:</label>
+            <div className="flex gap-4">
+              <button 
+                type="button"
+                onClick={() => setContactMethod("email")}
+                className={`text-xs md:text-sm px-2 py-0.5 border ${contactMethod === 'email' ? 'bg-primary text-black border-primary' : 'border-white/20 text-white/40 hover:text-white'}`}
+              >
+                [ EMAIL ]
+              </button>
+              <button 
+                type="button"
+                onClick={() => setContactMethod("whatsapp")}
+                className={`text-xs md:text-sm px-2 py-0.5 border ${contactMethod === 'whatsapp' ? 'bg-primary text-black border-primary' : 'border-white/20 text-white/40 hover:text-white'}`}
+              >
+                [ WHATSAPP ]
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 border-b border-white/5 pb-2">
+            <label className="text-primary md:min-w-[150px] text-xs md:text-sm">INFO_{contactMethod.toUpperCase()}:</label>
             <input 
-              type="email"
-              value={emailVal}
-              onChange={(e) => setEmailVal(e.target.value)}
+              type={contactMethod === 'email' ? 'email' : 'text'}
+              value={contactValue}
+              onChange={(e) => setContactValue(e.target.value)}
               disabled={isProcessing}
               className="bg-transparent border-none outline-none focus:ring-0 p-0 text-white placeholder:text-white/20 w-full font-mono caret-primary text-xs md:text-sm" 
-              placeholder="input_email (opt)" 
+              placeholder={contactMethod === 'email' ? 'user@domain.com' : '+52 55...'} 
+              required
             />
           </div>
 
           <div className="flex flex-col md:flex-row items-start gap-2 md:gap-4 border-b border-white/5 pb-2">
-            <label className="text-primary md:min-w-[120px] pt-1 text-xs md:text-sm">DATA_STRING:</label>
+            <label className="text-primary md:min-w-[150px] pt-1 text-xs md:text-sm">DESCRIPCION_PROYECTO:</label>
             <textarea 
               ref={inputRef}
               value={inputVal}
@@ -169,7 +190,7 @@ export default function Terminal() {
             ></textarea>
           </div>
 
-          <div className="mt-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="mt-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="flex items-center gap-3">
               <input 
                 type="checkbox" 

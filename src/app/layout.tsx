@@ -13,13 +13,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "HiperSoft Mainframe",
+  title: "HiperSoft",
   description: "Terminal Excellence para el futuro corporativo. Secure your business logic with hi-fidelity infrastructure.",
-  metadataBase: new URL("https://hipersoft.mx"),
+  metadataBase: new URL("https://hipersoft.com.mx"),
   openGraph: {
-    title: "HiperSoft Mainframe",
+    title: "HiperSoft",
     description: "Terminal Excellence para el futuro corporativo.",
-    url: "https://hipersoft.mx",
+    url: "https://hipersoft.com.mx",
     siteName: "HiperSoft",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
     locale: "es_MX",
@@ -27,12 +27,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "HiperSoft Mainframe",
+    title: "HiperSoft",
     description: "Terminal Excellence para el futuro corporativo.",
     images: ["/twitter-image.jpg"],
   },
   alternates: {
-    canonical: "https://hipersoft.mx",
+    canonical: "https://hipersoft.com.mx",
   },
 };
 
@@ -40,8 +40,8 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   name: "HiperSoft",
-  url: "https://hipersoft.mx",     
-  logo: "https://hipersoft.mx/logo.png",
+  url: "https://hipersoft.com.mx",
+  logo: "https://hipersoft.com.mx/logo.png",
   description: "Terminal Excellence para el futuro corporativo.",
 };
 

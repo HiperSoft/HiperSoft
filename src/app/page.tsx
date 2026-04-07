@@ -1,13 +1,15 @@
 import Image from "next/image";
 import { TerminalSquare, ArrowDown, ShieldCheck, Zap } from "lucide-react";
 import Terminal from "@/components/Terminal";
+import pkg from "../../package.json";
+import RotatingText from "@/components/RotatingText";
 
 export default function Home() {
   return (
     <>
       {/* Global Scanline Overlay */}
-      <div 
-        className="fixed inset-0 pointer-events-none opacity-[0.03] z-[100]" 
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.03] z-[100]"
         style={{ backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, #39FF14 3px)" }}
       />
       <div className="scanline" />
@@ -21,36 +23,33 @@ export default function Home() {
           </h1>
         </div>
         <nav className="hidden md:flex gap-8 items-center">
-          <a className="text-primary shadow-[0_0_15px_rgba(57,255,20,0.4)] font-display font-bold uppercase tracking-wider text-sm" href="#">HOME_</a>
-          <a className="text-[#353535] hover:text-primary hover:cursor-crosshair transition-all duration-200 font-display font-bold uppercase tracking-wider text-sm" href="#">NETWORK_</a>
-          <a className="text-[#353535] hover:text-primary hover:cursor-crosshair transition-all duration-200 font-display font-bold uppercase tracking-wider text-sm" href="#">CORE_OPS_</a>
-          <a className="text-[#353535] hover:text-primary hover:cursor-crosshair transition-all duration-200 font-display font-bold uppercase tracking-wider text-sm" href="#">SECURITY_</a>
+          <a className="text-primary shadow-[0_0_15px_rgba(57,255,20,0.4)] font-display font-bold uppercase tracking-wider text-sm" href="/">HOME_</a>
         </nav>
-        <button className="bg-black border border-primary text-primary px-4 md:px-6 py-1 font-mono font-bold hover:bg-primary hover:text-black transition-all duration-300 text-sm md:text-base">
-          LOGIN_
-        </button>
       </header>
 
       <main className="pt-16">
         {/* Hero Section */}
         <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden px-4 md:px-8">
           <div className="absolute inset-0 z-0 opacity-10 flex justify-around pointer-events-none font-mono text-[10px] text-primary" style={{ maskImage: "linear-gradient(to bottom, transparent, black, transparent)" }}>
-            <div className="h-full hidden md:block">010101<br/>HIPER<br/>SOFT<br/>010101</div>
-            <div className="h-full hidden md:block">SYSTEM<br/>BOOT<br/>ERROR<br/>NONE</div>
-            <div className="h-full">MAINFRAME<br/>ONLINE<br/>SECURE<br/>ENCRYPT</div>
-            <div className="h-full">ROOT<br/>ACCESS<br/>GRANTED<br/>0000</div>
+            <div className="h-full hidden md:block">010101<br />HIPER<br />SOFT<br />010101</div>
+            <div className="h-full hidden md:block">SYSTEM<br />BOOT<br />ERROR<br />NONE</div>
+            <div className="h-full">MAINFRAME<br />ONLINE<br />SECURE<br />ENCRYPT</div>
+            <div className="h-full">ROOT<br />ACCESS<br />GRANTED<br />0000</div>
           </div>
           <div className="relative z-10 text-center max-w-5xl flex flex-col items-center mt-[-10vh]">
-            <p className="font-mono text-primary mb-4 tracking-[0.3em] uppercase text-xs md:text-sm">STATUS: OPERATIONAL // V.4.0.2</p>
+            <p className="font-mono text-primary mb-4 tracking-[0.3em] uppercase text-xs md:text-sm">STATUS: OPERATIONAL // V.{pkg.version}</p>
             <h2 className="text-4xl md:text-6xl lg:text-8xl font-display font-bold text-white mb-8 leading-tight tracking-tighter uppercase">
-              SI PUEDES IMAGINARLO, <br/>
-              <span className="text-primary drop-shadow-[0_0_20px_rgba(57,255,20,0.4)] glitch-text" data-text="PODEMOS PROGRAMARLO_">PODEMOS PROGRAMARLO_</span>
+              SI PUEDES IMAGINARLO, <br />
+              PODEMOS <RotatingText />
             </h2>
-            <button className="group relative px-6 py-4 md:px-10 md:py-5 bg-primary text-[#053900] font-display font-black text-sm md:text-xl uppercase tracking-wider hover:shadow-[0_0_30px_rgba(57,255,20,0.8)] hover:bg-white transition-all duration-500 w-fit">
+            <a 
+              href="#contacto"
+              className="group relative px-6 py-4 md:px-10 md:py-5 bg-primary text-[#053900] font-display font-black text-sm md:text-xl uppercase tracking-wider hover:shadow-[0_0_30px_rgba(57,255,20,0.8)] hover:bg-white transition-all duration-500 w-fit no-underline inline-block"
+            >
               INICIAR PROTOCOLO DE PROYECTO
               <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-white"></div>
               <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-white"></div>
-            </button>
+            </a>
           </div>
           <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-[#353535]">
             <span className="text-[10px] font-mono tracking-[0.2em] uppercase">SCROLL_FOR_DATA</span>
@@ -62,15 +61,15 @@ export default function Home() {
         <section className="bg-surface-container-lowest border-y border-primary/10 py-12 px-8">
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
             <div className="group">
-              <p className="text-3xl md:text-5xl font-display font-bold text-white mb-2">150+ <span className="text-primary block md:inline text-xl md:text-5xl">SYSTEMS_DEPLOYED</span></p>
+              <p className="text-3xl md:text-5xl font-display font-bold text-white mb-2">7+ <span className="text-primary block md:inline text-xl md:text-5xl">AÑOS_EXP</span></p>
               <div className="h-px w-full bg-primary/20 scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
             </div>
             <div className="group">
-              <p className="text-3xl md:text-5xl font-display font-bold text-white mb-2">99.9% <span className="text-primary block md:inline text-xl md:text-5xl">UPTIME_RECORD</span></p>
+              <p className="text-3xl md:text-5xl font-display font-bold text-white mb-2">99.9% <span className="text-primary block md:inline text-xl md:text-5xl">CONFIABILIDAD</span></p>
               <div className="h-px w-full bg-primary/20 scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
             </div>
             <div className="group">
-              <p className="text-3xl md:text-5xl font-display font-bold text-white mb-2">24/7 <span className="text-primary block md:inline text-xl md:text-5xl">ACTIVE_MONITORING</span></p>
+              <p className="text-3xl md:text-5xl font-display font-bold text-white mb-2">24/7 <span className="text-primary block md:inline text-xl md:text-5xl">MONITOREO_CONTINUO</span></p>
               <div className="h-px w-full bg-primary/20 scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
             </div>
           </div>
@@ -111,9 +110,9 @@ export default function Home() {
         </section>
 
         {/* Terminal Section with REAL functional component */}
-        <section className="py-24 px-4 md:px-8 bg-surface-container-lowest relative z-30">
+        <section id="contacto" className="py-24 px-4 md:px-8 bg-surface-container-lowest relative z-30">
           <div className="flex items-center gap-4 mb-16 max-w-7xl mx-auto">
-            <h3 className="text-xl md:text-3xl font-display font-bold text-white uppercase tracking-tight">CONTACT_PROTOCOL_BETA</h3>
+            <h3 className="text-xl md:text-3xl font-display font-bold text-white uppercase tracking-tight">CONTACTANOS</h3>
             <div className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent"></div>
           </div>
           <Terminal />
@@ -153,9 +152,9 @@ export default function Home() {
       {/* Footer */}
       <footer className="w-full py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-4 bg-[#131313] border-t border-white/5 relative z-40">
         <div className="flex items-center gap-4 flex-col md:flex-row text-center md:text-left">
-          <span className="text-primary font-mono text-lg font-bold">HIPERSOFT_MAINFRAME</span>
+          <span className="text-primary font-mono text-lg font-bold">HIPERSOFT_COMPANY</span>
           <span className="text-[#353535] hidden md:block">|</span>
-          <p className="text-[#353535] font-sans text-[10px] tracking-[0.2em] uppercase">© 2026 HIPERSOFT_MAINFRAME. ALL RIGHTS RESERVED.</p>
+          <p className="text-[#353535] font-sans text-[10px] tracking-[0.2em] uppercase">© 2026 HIPERSOFT_COMPANY.</p>
         </div>
         <div className="flex gap-4 md:gap-8 flex-wrap justify-center">
           <a className="text-[#baccb0] hover:text-primary font-sans text-[10px] tracking-[0.2em] uppercase transition-colors" href="#">SYSTEM_STATUS</a>
@@ -165,7 +164,8 @@ export default function Home() {
       </footer>
 
       {/* Dynamic styles injected from previously created page block */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .glitch-text { position: relative; color: white; }
         .glitch-text::before, .glitch-text::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         .glitch-text::before { color: var(--color-primary); z-index: -1; animation: glitch-anim-1 2s infinite linear alternate-reverse; }

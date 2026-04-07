@@ -31,9 +31,6 @@ export default function Terminal() {
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
 
   const handleCommand = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -18,7 +18,7 @@ export default function PrivacyPolicy() {
             className="flex items-center gap-2 text-primary hover:text-white transition-colors w-fit group font-mono text-sm uppercase tracking-widest"
           >
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-            [VOLVER_AL_MAINFRAME]
+            [VOLVER_A_INICIO]
           </Link>
 
           <div className="flex items-center gap-3">
